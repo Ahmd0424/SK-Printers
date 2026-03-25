@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Printers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #1F2937;
+            background: linear-gradient(135deg, #DBEAFE 0%, #E0F2FE 50%, #EFF6FF 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.08);
+        }
+
+        .top-bar {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            padding: 1.5rem 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .top-bar h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .content {
+            padding: 1.5rem 1.5rem;
+            flex: 1;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .service-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .service-btn {
+            padding: 2rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.05);
+        }
+
+        .service-btn:active {
+            transform: scale(0.95);
+        }
+
+        .service-btn.active {
+            border: 2px solid #3B82F6;
+            background: #F0F9FF;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+        }
+
+        .service-btn.secondary {
+            opacity: 0.5;
+        }
+
+        .service-btn .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-btn .price {
+            font-size: 12px;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            background: white;
+            color: #1F2937;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            background: #F0F9FF;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .price-preview {
+            background: #F0F9FF;
+            border: 2px solid #BFDBFE;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 14px;
+            color: #4B5563;
+        }
+
+        .price-row span:last-child {
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .price-row.total {
+            border-top: 2px solid #BFDBFE;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            font-size: 16px;
+            color: #3B82F6;
+            font-weight: 700;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #3B82F6;
+            border: 2px solid #3B82F6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.95);
+            background: #F0F9FF;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #3B82F6;
+            border: 2px solid #3B82F6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+            width: 100%;
+        }
+
+        .btn-outline:active {
+            transform: scale(0.95);
+            background: #F0F9FF;
+        }
+
+        .btn-danger {
+            background: white;
+            color: #DC2626;
+            border: 2px solid #FCA5A5;
+            font-size: 12px;
+            padding: 0.625rem 1rem;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.05);
+        }
+
+        .btn-danger:active {
+            transform: scale(0.94);
+            background: #FEF2F2;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #F0F9FF;
+            border: 2px solid #BFDBFE;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6B7280;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #3B82F6;
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .date-filter input {
+            flex: 1;
+            min-width: 110px;
+            padding: 0.875rem 1rem;
+        }
+
+        .date-filter button {
+            flex: 0 0 auto;
+            min-width: 70px;
+            padding: 0.875rem 1rem;
+        }
+
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-item {
+            background: white;
+            border: 2px solid #E5E7EB;
+            padding: 1.25rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.05);
+        }
+
+        .order-item:active {
+            transform: scale(0.98);
+            border-color: #3B82F6;
+            background: #F0F9FF;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .order-number {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1F2937;
+        }
+
+        .order-detail {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .order-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #3B82F6;
+            margin-top: 0.75rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #9CA3AF;
+            padding: 3rem 1.5rem;
+            font-size: 14px;
+        }
+
+        .footer {
+            padding: 1rem 1.5rem 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="top-bar">
+            <h1>SK Printers</h1>
+        </div>
+
+        <!-- New Order Screen -->
+        <div class="screen active" id="orderScreen">
+            <div class="content">
+                <div class="header">
+                    <h2>New order</h2>
+                    <p>Select print type and quantity</p>
+                </div>
+
+                <div class="service-buttons" id="serviceButtons">
+                    <button type="button" class="service-btn" id="btn_print_bw" onclick="selectService('print_bw')">
+                        <div class="label">Black & White</div>
+                        <div class="price">Rs. 20/sheet</div>
+                    </button>
+                    <button type="button" class="service-btn" id="btn_print_color" onclick="selectService('print_color')">
+                        <div class="label">Colour</div>
+                        <div class="price">Rs. 40/sheet</div>
+                    </button>
+                    <button type="button" class="service-btn secondary" id="btn_copy_bw" onclick="selectService('copy_bw')">
+                        <div class="label">Photocopy B&W</div>
+                        <div class="price">Rs. 20/sheet</div>
+                    </button>
+                    <button type="button" class="service-btn secondary" id="btn_copy_color" onclick="selectService('copy_color')">
+                        <div class="label">Photocopy Colour</div>
+                        <div class="price">Rs. 30/sheet</div>
+                    </button>
+                </div>
+
+                <form id="orderForm" class="hidden">
+                    <div class="form-group">
+                        <label id="selectedServiceLabel"></label>
+                        <input type="number" id="quantity" oninput="updatePrice()" required placeholder="Enter number of sheets" min="1" step="1">
+                    </div>
+
+                    <div class="price-preview">
+                        <div class="price-row">
+                            <span>Unit price</span>
+                            <span id="unitPrice">Rs. 0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Quantity</span>
+                            <span id="quantityDisplay">0</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>Total</span>
+                            <span id="totalPrice">Rs. 0</span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">Save order</button>
+                        <button type="button" class="btn-secondary" onclick="backToServices()">Change service</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="footer">
+                <button class="btn-outline" onclick="switchScreen('summaryScreen')">View summary</button>
+            </div>
+        </div>
+
+        <!-- Summary Screen -->
+        <div class="screen" id="summaryScreen">
+            <div class="content">
+                <div class="header">
+                    <h2>Sales summary</h2>
+                    <p>View today or select a date range</p>
+                </div>
+
+                <div class="date-filter">
+                    <input type="date" id="startDate">
+                    <input type="date" id="endDate">
+                    <button class="btn-primary" onclick="filterByDates()">Filter</button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total sales</div>
+                        <div class="stat-value" id="totalSales">Rs. 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Orders</div>
+                        <div class="stat-value" id="totalOrders">0</div>
+                    </div>
+                </div>
+
+                <div id="ordersList" class="orders-list"></div>
+            </div>
+
+            <div class="footer">
+                <button class="btn-outline" onclick="switchScreen('orderScreen')">New order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const prices = {
+            'print_bw': 20,
+            'print_color': 40,
+            'copy_bw': 20,
+            'copy_color': 30
+        };
+
+        const serviceLabels = {
+            'print_bw': 'Print - Black & White (Rs. 20/sheet)',
+            'print_color': 'Print - Colour (Rs. 40/sheet)',
+            'copy_bw': 'Photocopy - Black & White (Rs. 20/sheet)',
+            'copy_color': 'Photocopy - Colour (Rs. 30/sheet)'
+        };
+
+        let orders = JSON.parse(localStorage.getItem('printingOrders')) || [];
+        let selectedService = null;
+
+        function selectService(serviceType) {
+            selectedService = serviceType;
+            document.querySelectorAll('.service-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn_' + serviceType).classList.add('active');
+            document.getElementById('serviceButtons').classList.add('hidden');
+            document.getElementById('orderForm').classList.remove('hidden');
+            document.getElementById('selectedServiceLabel').textContent = serviceLabels[serviceType];
+            setTimeout(() => {
+                document.getElementById('quantity').focus();
+            }, 100);
+            updatePrice();
+        }
+
+        function backToServices() {
+            selectedService = null;
+            document.getElementById('serviceButtons').classList.remove('hidden');
+            document.getElementById('orderForm').classList.add('hidden');
+            document.querySelectorAll('.service-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('quantity').value = '';
+            updatePrice();
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId === 'summaryScreen') {
+                loadTodaysSummary();
+            }
+        }
+
+        function updatePrice() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            if (!selectedService || !quantity) {
+                document.getElementById('unitPrice').textContent = 'Rs. 0';
+                document.getElementById('quantityDisplay').textContent = '0';
+                document.getElementById('totalPrice').textContent = 'Rs. 0';
+                return;
+            }
+            const unitPrice = prices[selectedService];
+            const total = unitPrice * quantity;
+            document.getElementById('unitPrice').textContent = 'Rs. ' + unitPrice;
+            document.getElementById('quantityDisplay').textContent = quantity;
+            document.getElementById('totalPrice').textContent = 'Rs. ' + total;
+        }
+
+        function getNextOrderNumber() {
+            if (orders.length === 0) return 1;
+            return Math.max(...orders.map(o => o.orderNumber)) + 1;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function getTodayDate() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const unitPrice = prices[selectedService];
+            const totalPrice = unitPrice * quantity;
+            const order = {
+                id: Date.now(),
+                orderNumber: getNextOrderNumber(),
+                serviceType: selectedService,
+                serviceLabel: serviceLabels[selectedService],
+                quantity: quantity,
+                unitPrice: unitPrice,
+                totalPrice: totalPrice,
+                date: getTodayDate()
+            };
+            orders.push(order);
+            localStorage.setItem('printingOrders', JSON.stringify(orders));
+            backToServices();
+        });
+
+        function loadTodaysSummary() {
+            const today = getTodayDate();
+            const todayOrders = orders.filter(o => o.date === today);
+            displayOrders(todayOrders);
+        }
+
+        function filterByDates() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert('Please select both dates');
+                return;
+            }
+            const filtered = orders.filter(o => o.date >= startDate && o.date <= endDate);
+            displayOrders(filtered);
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm('Delete this order?')) {
+                orders = orders.filter(o => o.id !== orderId);
+                localStorage.setItem('printingOrders', JSON.stringify(orders));
+                loadTodaysSummary();
+            }
+        }
+
+        function displayOrders(filteredOrders) {
+            const listContainer = document.getElementById('ordersList');
+            const totalSalesEl = document.getElementById('totalSales');
+            const totalOrdersEl = document.getElementById('totalOrders');
+            let total = 0;
+            filteredOrders.forEach(o => total += o.totalPrice);
+            totalSalesEl.textContent = 'Rs. ' + Math.round(total);
+            totalOrdersEl.textContent = filteredOrders.length;
+            if (filteredOrders.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state">No orders for this period</div>';
+                return;
+            }
+            listContainer.innerHTML = filteredOrders.map(order => `
+                <div class="order-item">
+                    <div class="order-header">
+                        <div class="order-number">Order #${order.orderNumber}</div>
+                        <button type="button" class="btn-danger" onclick="deleteOrder(${order.id})">Delete</button>
+                    </div>
+                    <div class="order-detail">${order.serviceLabel}</div>
+                    <div class="order-detail">${order.quantity} sheets × Rs. ${order.unitPrice} = Rs. ${order.totalPrice}</div>
+                    <div class="order-detail">${formatDate(order.date)}</div>
+                </div>
+            `).join('');
+        }
+
+        window.addEventListener('load', () => {
+            loadTodaysSummary();
+        });
+    </script>
+</body>
+</html>
